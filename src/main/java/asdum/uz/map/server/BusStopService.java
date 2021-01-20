@@ -76,7 +76,7 @@ public class BusStopService {
                         objects.add(root2.getAPoint().getRoute());
                         objects.add(root2.getBPoint().getRoute());
                         if (root2.getAPoint().getRoute().hashCode() == "chilonzor".hashCode()) {
-                            Optional<MetroStop> metroStop = metroRepository.selectStations("Paxtakor Bekati");
+                            Optional<MetroStop> metroStop = metroRepository.selectStations("${first}");
                             if (metroStop.isPresent()) {
                                 for (MetroStop chilonzor : all) {
                                     if (chilonzor.getTunnels().contains(String.valueOf(root2.getAPoint().getId()))) {

@@ -1,3 +1,4 @@
+/*
 package asdum.uz.map.metro;
 
 import asdum.uz.controller.MarshrutController;
@@ -50,7 +51,9 @@ public class MetroServer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        /****************************todo o`zbekiston linyasi **************************/
+        */
+/****************************todo o`zbekiston linyasi **************************//*
+
 
         List<BusStop> busStopList = new ArrayList<>();
         List<Long> bb = new ArrayList<>();
@@ -342,7 +345,9 @@ public class MetroServer implements CommandLineRunner {
         busStopList.add(new BusStop(1039, "Do`stlik Bekati", "metroUz", 41.294132, 69.321717, "METRO", "O`zbekiston"));
         busStopList.add(new BusStop(1040, "Do`stlik Bekati", "metroUz", 41.293496, 69.323708, "METRO", "O`zbekiston"));
 
-        /****************************todo yer usti xalqa yo`li linyasi **************************/
+        */
+/****************************todo yer usti xalqa yo`li linyasi **************************//*
+
 
         busStopList.add(new BusStop(1041, "Do`stlik 2 Bekati", "metroUz", 41.294379, 69.322695, "METRO", "yer_usti_halqa_yo`li"));
 
@@ -365,7 +370,9 @@ public class MetroServer implements CommandLineRunner {
         busStopList.add(new BusStop(1053, "7 Bekati", "metroUz", 41.237596, 69.327412, "METRO", "yer_usti_halqa_yo`li"));
         busStopList.add(new BusStop(1054, "7 Bekati", "metroUz", 41.237251, 69.326918, "METRO", "yer_usti_halqa_yo`li"));
 
-        /****************************todo yunsobot linyasi **************************/
+        */
+/****************************todo yunsobot linyasi **************************//*
+
 
         busStopList.add(new BusStop(1055, "Turkiston Bekati", "metroUz", 41.378337, 69.296712, "METRO", "yunusobod"));
         busStopList.add(new BusStop(1056, "Turkiston Bekati", "metroUz", 41.378220, 69.295758, "METRO", "yunusobod"));
@@ -405,7 +412,9 @@ public class MetroServer implements CommandLineRunner {
         busStopList.add(new BusStop(1092, "Ming o`rik Bekati", "metroUz", 41.299250, 69.273226, "METRO", "yunusobod"));
         busStopList.add(new BusStop(1093, "Ming o`rik Bekati", "metroUz", 41.298741, 69.273803, "METRO", "yunusobod"));
 
-        /****************************todo Chilonzor linyasi **************************/
+        */
+/****************************todo Chilonzor linyasi **************************//*
+
 
         busStopList.add(new BusStop(1094, "Buyuk ipak yo`li Bekati", "metroUz", 41.326207, 69.327823, "METRO", "chilonzor"));
         busStopList.add(new BusStop(1095, "Buyuk ipak yo`li Bekati", "metroUz", 41.325812, 69.327538, "METRO", "chilonzor"));
@@ -553,4 +562,4 @@ public class MetroServer implements CommandLineRunner {
             metroRepository.save(metro);
         }
     }
-}
+}*/

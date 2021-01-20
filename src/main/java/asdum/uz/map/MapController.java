@@ -10,10 +10,7 @@ import asdum.uz.map.server.BusStopService;
 import asdum.uz.payload.ApiResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -44,8 +41,8 @@ public class MapController {
         return new ApiResponseModel(response != null ? ResStatusEnum.INFO : ResStatusEnum.WARNING, response != null ? "200" : "100", response != null ? busStopService.filter(response) : null);
     }
 
-    @GetMapping("/point/byId")
-    public ApiResponseModel root(@RequestParam(name = "aPointId") Long aPointId, @RequestParam(name = "bPointId") Long bPointId, @RequestParam(name = "busId") String busId) {
+    @GetMapping("/point/{busId}")
+    public ApiResponseModel root(@PathVariable(name = "busId") String busId, @RequestParam(name = "aPointId") Long aPointId, @RequestParam(name = "bPointId") Long bPointId) {
         return new ApiResponseModel(ResStatusEnum.INFO, "200", busStopService.getRoot(aPointId, bPointId, busId));
     }
 
