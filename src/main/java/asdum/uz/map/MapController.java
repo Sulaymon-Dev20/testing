@@ -31,7 +31,7 @@ public class MapController {
     }
 
     @GetMapping(value = "/radiusBusStop", produces = "application/json")
-    public List<BusStop> getBusStopByQuery(@RequestParam(value = "latitude", required = false) String latitude, @RequestParam(value = "longitude", required = false) String longitude, @RequestParam(value = "radius", defaultValue = "0.5", required = false) String radius) {
+    public List<BusStop> getBusStopByQuery(@RequestParam(value = "latitude", required = false) Double latitude, @RequestParam(value = "longitude", required = false) Double longitude, @RequestParam(value = "radius", defaultValue = "0.5", required = false) String radius) {
         return BusMapQueryHandler.getInstance().getBusStop(latitude, longitude, radius);
     }
 

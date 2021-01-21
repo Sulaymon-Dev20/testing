@@ -30,14 +30,14 @@ public class BusMapQueryHandler {
         return INSTANCE;
     }
 
-    public List<BusStop> getBusStop(String latitudeStr, String longitudeStr, String radiusStr) {
-        List<BusStop> queryResult = null;
-        queryResult = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
+    public List<BusStop> getBusStop(Double latitudeStr, Double longitudeStr, String radiusStr) {
+        List<BusStop> queryResult = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
         if (latitudeStr != null && longitudeStr != null && radiusStr != null) {
             try {
-                queryResult = getBusMapInsideCircle(queryResult, Double.parseDouble(latitudeStr), Double.parseDouble(longitudeStr), Double.parseDouble(radiusStr));
+                queryResult = getBusMapInsideCircle(queryResult, latitudeStr, longitudeStr, Double.parseDouble(radiusStr));
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Radius bo`yicha hisoblashda xatoli yuz berdi");
+                return null;
             }
         }
         return queryResult;
@@ -79,8 +79,7 @@ public class BusMapQueryHandler {
         synchronized (BusMapAccessor.class) {
             List<BusStop> busMapInsideCircle = new ArrayList<BusStop>();
             for (BusStop busStop : busStops) {
-                double distance = distance(busStop.getLat(), busStop.getLng(), latitude, longitude, 'K');
-                if (distance < radius) {
+                if (distance(busStop.getLat(), busStop.getLng(), latitude, longitude, 'K') < radius) {
                     busMapInsideCircle.add(busStop);
                 }
             }
@@ -89,6 +88,16 @@ public class BusMapQueryHandler {
     }
 
     private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
+        synchronized (BusMapAccessor.class) {
+            double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(lon1 - lon2));
+            dist = Math.acos(dist);
+            dist = rad2deg(dist);
+            dist = dist * 60 * 1.1515;
+            dist = unit == 'M' ? dist * 1.609344 * 1000 : dist * 1.609344;
+            return (dist);
+        }
+    }
+    /*    private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
         synchronized (BusMapAccessor.class) {
             double theta = lon1 - lon2;
             double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
@@ -102,7 +111,7 @@ public class BusMapQueryHandler {
             }
             return (dist);
         }
-    }
+    }*/
 
     private double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);

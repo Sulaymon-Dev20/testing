@@ -14,15 +14,15 @@ import com.hazelcast.core.IFunction;
 import com.hazelcast.core.IMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@PropertySource("classpath:application.properties")
+@PropertySource("classpath:metro.yml")
 public class BusStopService {
 
     @Autowired
@@ -68,6 +68,16 @@ public class BusStopService {
                         }
                     }
                 }
+//                IMap<Long, Map<String, Object>> routeProps = cacheConfig.getRoutes().getMap("routeProps");
+//                Set<Long> targetSet = new HashSet<>(list);
+//                Map<Long, Map<String, Object>> routePropsAll = routeProps.getAll(targetSet);
+//                List<Map<String, Object>> list1 = new ArrayList<>();
+//                for (Map.Entry<Long, Map<String, Object>> route : routePropsAll.entrySet()) {
+//                    Long key = route.getKey();
+//                    Map<String, Object> value = route.getValue();
+//                    value.put("route_id", key);
+//                    list1.add(value);
+//                }
             } else {
                 List<MetroStop> all = root2.getAPoint().getId() < root2.getBPoint().getId() ? metroRepository.findAllByRoute(root2.getAPoint().getRoute()) : metroRepository.findAllByRoute2(root2.getAPoint().getRoute());
                 if (root2.getAPoint().getRoute().hashCode() == root2.getBPoint().getRoute().hashCode()) {
