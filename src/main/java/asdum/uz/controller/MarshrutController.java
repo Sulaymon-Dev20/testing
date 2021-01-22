@@ -21,31 +21,15 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 
 
-/**
- * @author Sulaymon Yahyo
- * @version 2.1
- * ushbu controller classining vazifasi
- * <img src="../doc-files/bus.png" alt="error" width="100" height="100"/>
- */
 @RestController
 @RequestMapping("/api/mobile/v2")
 public class MarshrutController {
 
-//    @Autowired
-//    MarshrutService marshrutService;
-
-    /**
-     * CashConfigning vazifasi bizda db mavjud emas va biz db sifatida cash configni ishlatyammiz
-     */
     @Autowired
     CacheConfig cacheConfig;
 
-    /**
-     * JdbcTemplateni aslida biz ishlatmasligimiz kerak lekin cashda bu malumotlar bo`lmagani uchun dbga mog`lanyapmiz lekin kiyinchalik bu method ham cachega o`tadi
-     */
     @Autowired
     JdbcTemplate jdbcTemplate;
-
 
     private Comparator<ViaResponse> distanceComparator;
 
@@ -73,14 +57,23 @@ public class MarshrutController {
     }
 
     @GetMapping("/stationRoutes/{id}") //TODO
-    public HttpEntity<?> stationRoutes(@PathVariable String id) {
-        IMap<Long, List<Long>> stationRoutes = cacheConfig.getRoutes().getMap("stationRoutes");
-        IMap<Long, Object> routeProps = cacheConfig.getRoutes().getMap("routeProps");
-        List<Long> list = stationRoutes.get(Long.parseLong(id));
-        Set<Long> targetSet = new HashSet<>(list);
-        Object o = routeProps.getAll(targetSet);
+    public HttpEntity<?> stationRoutes(@PathVariable Long id) {
+        List<Long> list = (List<Long>) cacheConfig.getRoutes().getMap("stationRoutes").get(id);
 
-        return ResponseEntity.ok(o);
+        Set<Long> targetSet = new HashSet<>(list);
+        IMap<Long, Map<String, Object>> routeProps = cacheConfig.getRoutes().getMap("routeProps");
+        Map<Long, Map<String, Object>> routePropsAll = routeProps.getAll(targetSet);
+        List<Map<String, Object>> list1 = new ArrayList<>();
+        for (Map.Entry<Long, Map<String, Object>> route : routePropsAll.entrySet()) {
+            Long key = route.getKey();
+            Map<String, Object> value = route.getValue();
+            value.put("route_id", key);
+            list1.add(value);
+        }
+
+//        list1.add((Map<String, Object>) targetSet);
+
+        return ResponseEntity.ok(list1);
     }
 
     @GetMapping("/stationRoutes") //TODO
@@ -159,7 +152,7 @@ public class MarshrutController {
     public ResStations getStationsBySort(@PathVariable Long id) {
         String sql = "select s.id,  s.name sn, p.distance d, p.lat, p.lng, case  when s.id=m.kpp1 then '1' when s.id =m.kpp2 then '2' end side from stations s " +
                 " left join points p on p.station_id=s.id left join marshrut m on m.id=" + id + " and m.viamobile=true and m.deleted=false " +
-                " where length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = m.id" +
+                " where length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = m.id and m.deleted=false" +
                 " order by p.distance";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
         ResStations resStations = new ResStations();
@@ -179,6 +172,29 @@ public class MarshrutController {
             }
 
         }
+
+        String sql1 = "select p.id, p.marshrut_id, p.station_id,p.lat,p.lng, case when p.station_id = m.kpp1 then '1' when p.station_id = m.kpp2 then '2' end sidePoint\n" +
+                "from points p\n" +
+                "         join marshrut m on p.marshrut_id = m.id\n" +
+                "where p.marshrut_id =" + id + " and m.deleted=false";
+        List<Map<String, Object>> points = jdbcTemplate.queryForList(sql1);
+        List<Object> kpp1Point = new ArrayList<>();
+        List<Object> kpp2Point = new ArrayList<>();
+        boolean pointSide = true;
+        for (Map<String, Object> point : points) {
+            Object sidePoint = point.get("sidePoint");
+            int point1 = sidePoint == null ? 0 : Integer.parseInt(sidePoint.toString());
+            if (point1 == 2 || !pointSide) {
+                pointSide = false;
+                kpp2Point.add(point);
+            }
+            if (pointSide || point1 == 1) {
+                kpp1Point.add(point);
+            }
+        }
+
+//        resStations.setKpp1Point(kpp1Point);
+//        resStations.setKpp2Point(kpp2Point);
         resStations.setKpp1(kpp1);
         resStations.setKpp2(kpp2);
 
@@ -223,10 +239,28 @@ public class MarshrutController {
 
     @GetMapping("/getPointsByMarshrut/{id}")
     public ApiResponseModel getPointsByMarshrut(@PathVariable Long id) {
-        String sql = "select p.id, p.marshrut_id, p.station_id from points p where p.marshrut_id=" + id + " order by p.distance";
+        String sql = "select p.id, p.marshrut_id, p.station_id, p.lng,p.lat from points p where p.marshrut_id=" + id + " order by p.distance";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
         // System.out.println(maps);
         return new ApiResponseModel(ResStatusEnum.INFO, "Ok", maps);
     }
 
+    @GetMapping("/station/search")
+    public ApiResponseModel getBySearch(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
+            @RequestParam(value = "search", defaultValue = "all") String search) {
+        int number = 0;
+        if (page > 0) {
+            number = page * size;
+        }
+        String station = "select s.id,s.name,s.lat,s.lng,s.distance,s.routes from stations s where UPPER(s.name) like upper('%" + search + "%') and s.deleted=false order by s.distance limit " + size + " offset " + number + "";
+        List<Map<String, Object>> search_station = jdbcTemplate.queryForList(station);
+        return new ApiResponseModel(ResStatusEnum.INFO, "Ok", search_station);
+    }
+
+//    @GetMapping("/getBusLocation")
+//    public ApiResponseModel getBusLocation() {
+//        return new ApiResponseModel(ResStatusEnum.INFO, "Ok", currentLocationRepository.findAllByGpsstatus("A"));
+//    }
 }

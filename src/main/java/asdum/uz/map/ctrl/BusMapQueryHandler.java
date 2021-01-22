@@ -1,7 +1,6 @@
 package asdum.uz.map.ctrl;
 
 import asdum.uz.config.CacheConfig;
-import asdum.uz.controller.MarshrutController;
 import asdum.uz.map.dataaccess.BusMapAccessor;
 import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.Root2;
@@ -11,15 +10,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class BusMapQueryHandler {
 
     @Autowired
     CacheConfig cacheConfig;
-
-    @Autowired
-    MarshrutController marshrutController;
 
     private static BusMapQueryHandler INSTANCE = new BusMapQueryHandler();
 
@@ -30,11 +28,14 @@ public class BusMapQueryHandler {
         return INSTANCE;
     }
 
-    public List<BusStop> getBusStop(Double latitudeStr, Double longitudeStr, String radiusStr) {
+    public List<BusStop> getBusStop(Double latitudeStr, Double longitudeStr, Double radiusStr) {
         List<BusStop> queryResult = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
         if (latitudeStr != null && longitudeStr != null && radiusStr != null) {
             try {
-                queryResult = getBusMapInsideCircle(queryResult, latitudeStr, longitudeStr, Double.parseDouble(radiusStr));
+                do {
+                    queryResult = getBusMapInsideCircle(queryResult, latitudeStr, longitudeStr, radiusStr);
+                    radiusStr = radiusStr + 0.5;
+                } while (queryResult.size() <= 7);
             } catch (Exception e) {
                 System.out.println("Radius bo`yicha hisoblashda xatoli yuz berdi");
                 return null;
@@ -43,13 +44,13 @@ public class BusMapQueryHandler {
         return queryResult;
     }
 
-    public Root2 toAtoB(double aPointLat, double aPointLng, double bPointLat, double bPointLng, String radiusStr) {
+    public Root2 toAtoB(double aPointLat, double aPointLng, double bPointLat, double bPointLng) {
         List<BusStop> allBusStop = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
-        if (aPointLng != 0 && aPointLat != 0 && bPointLng != 0 && bPointLat != 0 && radiusStr != null) {
+        if (aPointLng != 0 && aPointLat != 0 && bPointLng != 0 && bPointLat != 0) {
             try {
-                double v = Double.parseDouble(radiusStr);
                 List<BusStop> aPointQueryResult;
                 List<BusStop> bPointQueryResult;
+                double v = 0.5;
                 do {
                     aPointQueryResult = getBusMapInsideCircle(allBusStop, aPointLat, aPointLng, v);
                     bPointQueryResult = getBusMapInsideCircle(allBusStop, bPointLat, bPointLng, v);

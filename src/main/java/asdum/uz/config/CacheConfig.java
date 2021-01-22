@@ -3,6 +3,8 @@ package asdum.uz.config;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spring.cache.HazelcastCacheManager;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -21,4 +23,17 @@ public class CacheConfig {
         return HazelcastClient.newHazelcastClient(clientConfig);
     }
 
+/*    @Bean
+    public HazelcastInstance getLocation() {
+        ClientConfig clientConfig1 = new ClientConfig();
+        clientConfig1.getNetworkConfig().addAddress("192.168.0.30:5701");
+        clientConfig1.getGroupConfig().setName("location");
+        clientConfig1.getGroupConfig().setPassword("1234");
+        return HazelcastClient.newHazelcastClient(clientConfig1);
+    }*/
+
+    @Bean
+    public CacheManager cacheManager() {
+        return new HazelcastCacheManager();
+    }
 }

@@ -81,7 +81,6 @@ public class BusMapAccessor {
         }
     }
 
-    @Scheduled(cron = "0 0 12 1 * ?")
     public void removeAllBusStop() {
         synchronized (BusMapAccessor.class) {
             List<BusStop> busStops = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);

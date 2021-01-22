@@ -19,6 +19,7 @@ public class BusStop {
     private double lng;
     private String status;
     private String route;
+    private String[] routeList;
     // Constructor(s) ----------------------------------------------------
     public BusStop() {
         super();

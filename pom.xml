@@ -82,6 +82,10 @@
             <artifactId>hazelcast-all</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

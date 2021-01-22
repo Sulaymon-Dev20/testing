@@ -10,7 +10,6 @@ import asdum.uz.map.model.Root;
 import asdum.uz.map.model.Root2;
 import asdum.uz.map.model.enums.BusStopStatusEnum;
 import asdum.uz.payload.ResStations;
-import com.hazelcast.core.IFunction;
 import com.hazelcast.core.IMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,16 +67,6 @@ public class BusStopService {
                         }
                     }
                 }
-//                IMap<Long, Map<String, Object>> routeProps = cacheConfig.getRoutes().getMap("routeProps");
-//                Set<Long> targetSet = new HashSet<>(list);
-//                Map<Long, Map<String, Object>> routePropsAll = routeProps.getAll(targetSet);
-//                List<Map<String, Object>> list1 = new ArrayList<>();
-//                for (Map.Entry<Long, Map<String, Object>> route : routePropsAll.entrySet()) {
-//                    Long key = route.getKey();
-//                    Map<String, Object> value = route.getValue();
-//                    value.put("route_id", key);
-//                    list1.add(value);
-//                }
             } else {
                 List<MetroStop> all = root2.getAPoint().getId() < root2.getBPoint().getId() ? metroRepository.findAllByRoute(root2.getAPoint().getRoute()) : metroRepository.findAllByRoute2(root2.getAPoint().getRoute());
                 if (root2.getAPoint().getRoute().hashCode() == root2.getBPoint().getRoute().hashCode()) {
@@ -124,10 +113,9 @@ public class BusStopService {
                     }
                 }
             }
-            return new Root(root2.getAPoint().getStatus() == null ? "BUS_STOP" : "METRO", root2.getAPoint(), root2.getBPoint(), null, objects, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
-//            return new Root("BUS_STOP", root2.getAPoint(), root2.getBPoint(), null, objects, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
+            return new Root(root2.getAPoint().getStatus() == null ? "BUS_STOP" : "METRO", root2.getAPoint(), root2.getBPoint(), objects, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
         } catch (Exception e) {
-            return new Root("Bus null", root2.getAPoint(), root2.getBPoint(), null, null, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
+            return new Root("Bus null", root2.getAPoint(), root2.getBPoint(), null, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
         }
     }
 

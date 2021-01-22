@@ -10,6 +10,7 @@ import asdum.uz.map.server.BusStopService;
 import asdum.uz.payload.ApiResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,14 +31,14 @@ public class MapController {
         return BusMapAccessor.getInstance().getAllBusStops();
     }
 
-    @GetMapping(value = "/radiusBusStop", produces = "application/json")
-    public List<BusStop> getBusStopByQuery(@RequestParam(value = "latitude", required = false) Double latitude, @RequestParam(value = "longitude", required = false) Double longitude, @RequestParam(value = "radius", defaultValue = "0.5", required = false) String radius) {
+    @GetMapping(value = "/radius", produces = "application/json")
+    public List<BusStop> getBusStopByQuery(@RequestParam(value = "latitude", required = false) Double latitude, @RequestParam(value = "longitude", required = false) Double longitude, @RequestParam(value = "radius", defaultValue = "0.5", required = false) Double radius) {
         return BusMapQueryHandler.getInstance().getBusStop(latitude, longitude, radius);
     }
 
     @GetMapping("/point")
-    public ApiResponseModel getAtoBPoint2(@RequestParam(name = "aPointLng") double aPointLng, @RequestParam(name = "aPointLat") double aPointLat, @RequestParam(name = "bPointLng") double bPointLng, @RequestParam(name = "bPointLat") double bPointLat, @RequestParam(value = "radius", defaultValue = "0.05", required = false) String radius) {
-        Root2 response = BusMapQueryHandler.getInstance().toAtoB(aPointLat, aPointLng, bPointLat, bPointLng, radius);
+    public ApiResponseModel getAtoBPoint2(@RequestParam(name = "aPointLng") double aPointLng, @RequestParam(name = "aPointLat") double aPointLat, @RequestParam(name = "bPointLng") double bPointLng, @RequestParam(name = "bPointLat") double bPointLat) {
+        Root2 response = BusMapQueryHandler.getInstance().toAtoB(aPointLat, aPointLng, bPointLat, bPointLng);
         return new ApiResponseModel(response != null ? ResStatusEnum.INFO : ResStatusEnum.WARNING, response != null ? "200" : "100", response != null ? busStopService.filter(response) : null);
     }
 
@@ -46,7 +47,7 @@ public class MapController {
         return new ApiResponseModel(ResStatusEnum.INFO, "200", busStopService.getRoot(aPointId, bPointId, busId));
     }
 
-    @GetMapping("/updateData")
+    @Scheduled(cron = "0 0 12 1 * ?")
     public void updateData() {
         BusMapAccessor.getInstance().removeAllBusStop();
         BusStopSetUpData.getInstance().initialize();
