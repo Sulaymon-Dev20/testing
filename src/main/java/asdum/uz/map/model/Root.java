@@ -13,7 +13,7 @@ public class Root {
     String status;
     BusStop aPoint;
     BusStop bPoint;
-    List<Object> direction;
+    List<Object> routs;
     Double distanceA;
     Double distance;
     Double distanceB;

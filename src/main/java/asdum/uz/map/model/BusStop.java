@@ -20,6 +20,7 @@ public class BusStop {
     private String status;
     private String route;
     private String[] routeList;
+    private List<Long> routeIdList;
     // Constructor(s) ----------------------------------------------------
     public BusStop() {
         super();

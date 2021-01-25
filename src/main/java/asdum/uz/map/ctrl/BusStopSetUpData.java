@@ -1,3 +1,4 @@
+/*
 package asdum.uz.map.ctrl;
 
 import asdum.uz.map.dataaccess.BusMapAccessor;
@@ -43,6 +44,7 @@ public class BusStopSetUpData {
                             String[] strings = busStop.getRoutes().split(",");
                             busStop.setRouteList(strings);
                         }
+
                         BusMapAccessor.getInstance().addBusStop(busStop);
                     }
 //                    initialized = true;
@@ -56,3 +58,4 @@ public class BusStopSetUpData {
         System.err.println(fixed ? "The data has been uploaded !" : "Data retrieval error");
     }
 }
+*/

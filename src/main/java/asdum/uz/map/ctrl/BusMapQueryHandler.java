@@ -5,13 +5,12 @@ import asdum.uz.map.dataaccess.BusMapAccessor;
 import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.Root2;
 import asdum.uz.map.model.enums.BusStopStatusEnum;
+import asdum.uz.map.test.Test2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class BusMapQueryHandler {
@@ -76,6 +75,28 @@ public class BusMapQueryHandler {
         return null;
     }
 
+    public Test2 test(double aPointLat, double aPointLng, double bPointLat, double bPointLng) {
+        synchronized (BusMapAccessor.class) {
+            List<BusStop> allBusStop = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
+            if (aPointLng != 0 && aPointLat != 0 && bPointLng != 0 && bPointLat != 0) {
+                try {
+                    List<BusStop> aPointQueryResult;
+                    List<BusStop> bPointQueryResult;
+                    double v = 0.5;
+                    do {
+                        aPointQueryResult = getBusMapInsideCircle(allBusStop, aPointLat, aPointLng, v);
+                        bPointQueryResult = getBusMapInsideCircle(allBusStop, bPointLat, bPointLng, v);
+                        v = v + 0.3;
+                    } while (aPointQueryResult.size() == 0 || bPointQueryResult.size() == 0);
+                    return new Test2(aPointQueryResult.subList(0, 3), bPointQueryResult.subList(0, 3));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
+
     public List<BusStop> getBusMapInsideCircle(List<BusStop> busStops, double latitude, double longitude, double radius) {
         synchronized (BusMapAccessor.class) {
             List<BusStop> busMapInsideCircle = new ArrayList<BusStop>();
@@ -98,21 +119,6 @@ public class BusMapQueryHandler {
             return (dist);
         }
     }
-    /*    private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
-        synchronized (BusMapAccessor.class) {
-            double theta = lon1 - lon2;
-            double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-            dist = Math.acos(dist);
-            dist = rad2deg(dist);
-            dist = dist * 60 * 1.1515;
-            if (unit == 'M') {
-                dist = dist * 1.609344 * 1000;
-            } else if (unit == 'K') {
-                dist = dist * 1.609344;
-            }
-            return (dist);
-        }
-    }*/
 
     private double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);

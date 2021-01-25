@@ -60,29 +60,29 @@
 <div id="map"></div>
 <script>
 
-    var query_status =
+    const query_status =
         {
             valid: false,
             status: ""
-        }
+        };
 
-    var api = "/api/mobile/v2/radiusBusStop?";
+    const api = "/api/mobile/v2/radius?";
 
     // Map objects/references
-    var map;
-    var markers = [];
-    var selectedPositionMarker;
-    var shownInfowindow;
+    let map;
+    let markers = [];
+    let selectedPositionMarker;
+    let shownInfowindow;
 
     // Default selected position is San Fransisco
-    var selected_position =
+    const selected_position =
         {
             lat: 41.320052,
             lng: 69.253966
         };
 
     // Geographic position of San Fransisco
-    var san_fransisco =
+    const san_fransisco =
         {
             lat: 41.320052,
             lng: 69.253966
@@ -153,9 +153,9 @@
     // Constructs the query string
     // Runs the query and obtains the result in JSON format.
     function getBusStops() {
-        var status = document.getElementById("status");
-        var url = api;
-        var locationQuery = getLocationQueryAndValidate(); // Query of latitude, longitude and distance
+        const status = document.getElementById("status");
+        let url = api;
+        const locationQuery = getLocationQueryAndValidate(); // Query of latitude, longitude and distance
 
         // Append the status query
         url += "status=" + status.value;
@@ -178,14 +178,14 @@
     function getBusStopsJSON(data) {
         clearMarkers();
 
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             // Info window
-            var infowindow = new google.maps.InfoWindow();
+            const infowindow = new google.maps.InfoWindow();
             // Content that will be shown on the info window
-            var content = getInfoWindowContentString(data[i]);
+            const content = getInfoWindowContentString(data[i]);
 
             // Create the marker
-            var marker = new google.maps.Marker({
+            const marker = new google.maps.Marker({
                 position: {
                     lat: data[i].lat,
                     lng: data[i].lng
@@ -212,7 +212,7 @@
 
     // Removes the markers from the map.
     function clearMarkers() {
-        for (var i = 0; i < markers.length; i++) {
+        for (let i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
         }
         markers = [];
@@ -226,14 +226,14 @@
     // Validates the location query by cheking latitude, longitude and distance input fields.
     // Also constructs and returns the query string
     function getLocationQueryAndValidate() {
-        var queryStr = "";
+        let queryStr = "";
         query_status.valid = true; // Set the query status to true
 
         // Obtain the input values
-        var latitude = document.getElementById("latitude").value;
-        var longitude = document.getElementById("longitude").value;
-        var radius = document.getElementById("radius").value;
-        var radius_unit = document.getElementById("radius_unit").value;
+        const latitude = document.getElementById("latitude").value;
+        const longitude = document.getElementById("longitude").value;
+        const radius = document.getElementById("radius").value;
+        const radius_unit = document.getElementById("radius_unit").value;
 
         // If all inputs are empty
         if (emptyString(latitude) && emptyString(longitude) && emptyString(radius)) {
@@ -280,7 +280,7 @@
             '</div>' +
             '<b>bus stop: </b>' + busStop.name + '<br/>' +
             '<b>buses: </b>' + busStop.routes + '<br/>' +
-            '<b>location: </b>' + busStop.lat +"/"+ busStop.lng + '<br/>' +
+            '<b>location: </b>' + busStop.lat + "/" + busStop.lng + '<br/>' +
             '<a href="http://t.me/Sulaymon_Yahyo">MY TELEGRAM ADDRESS</a>' +
             '</div>' +
             '</div>';
