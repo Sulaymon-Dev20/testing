@@ -6,6 +6,9 @@ import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.Root2;
 import asdum.uz.map.model.enums.BusStopStatusEnum;
 import asdum.uz.map.test.Test2;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,20 +30,21 @@ public class BusMapQueryHandler {
         return INSTANCE;
     }
 
-    public List<BusStop> getBusStop(Double latitudeStr, Double longitudeStr, Double radiusStr) {
+    public List<BusStop> getBusStop(Double latitudeStr, Double longitudeStr) {
         List<BusStop> queryResult = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
-        if (latitudeStr != null && longitudeStr != null && radiusStr != null) {
+        List<BusStop> response = new ArrayList<>();
+        if (latitudeStr != null && longitudeStr != null) {
             try {
+                double radius = 0.3;
                 do {
-                    queryResult = getBusMapInsideCircle(queryResult, latitudeStr, longitudeStr, radiusStr);
-                    radiusStr = radiusStr + 0.5;
-                } while (queryResult.size() <= 7);
+                    response = getBusMapInsideCircle(queryResult, latitudeStr, longitudeStr, radius);
+                    radius = radius + 0.3;
+                } while (response.size() <= 10);
             } catch (Exception e) {
-                System.out.println("Radius bo`yicha hisoblashda xatoli yuz berdi");
-                return null;
+                e.printStackTrace();
             }
         }
-        return queryResult;
+        return response;
     }
 
     public Root2 toAtoB(double aPointLat, double aPointLng, double bPointLat, double bPointLng) {
@@ -88,7 +92,7 @@ public class BusMapQueryHandler {
                         bPointQueryResult = getBusMapInsideCircle(allBusStop, bPointLat, bPointLng, v);
                         v = v + 0.3;
                     } while (aPointQueryResult.size() == 0 || bPointQueryResult.size() == 0);
-                    return new Test2(aPointQueryResult.subList(0, 3), bPointQueryResult.subList(0, 3));
+                    return new Test2(aPointQueryResult.subList(0, 5), bPointQueryResult.subList(0, 5));
                 } catch (Exception e) {
                     return null;
                 }
@@ -127,4 +131,12 @@ public class BusMapQueryHandler {
     private double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
     }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Response {
+    private BusStop busStop;
+    private Double radius;
 }

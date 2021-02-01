@@ -1,42 +1,42 @@
 package asdum.uz.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * Created by root on 11/26/14.
- */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ViaResponse {
 
-    @JsonProperty(value = "g")
+    @JsonProperty(value = "gosNumber")
     private String gosNo;
 
-    @JsonProperty(value = "b")
+    @JsonProperty(value = "busId")
     private Long busId;
 
-    @JsonProperty(value = "t")
+    @JsonProperty(value = "remainingTime")
     private Long remainingTime;
 
-    @JsonProperty(value = "d")
+    @JsonProperty(value = "remainingDistance")
     private Long remainingDistance;
 
-    @JsonProperty(value = "r")
+    @JsonProperty(value = "regDateTime")
     private String regDateTime;
 
-    @JsonProperty(value = "i")
+    @JsonProperty(value = "onOff")
     private Integer onOff;
 
-    @JsonProperty(value = "p")
-    private Integer polygonType;
+/*    @JsonProperty(value = "polygonType")
+    private Integer polygonType;*/
 
-    @JsonProperty(value = "m")
+    @JsonProperty(value = "model")
     private String model;
 
-    @JsonProperty(value = "m_uz")
+    @JsonProperty(value = "modelNameInUz")
     private String modelNameInUz;
 
-    @JsonProperty(value = "s")
+    @JsonProperty(value = "speed")
     private Integer speed;
-
 }

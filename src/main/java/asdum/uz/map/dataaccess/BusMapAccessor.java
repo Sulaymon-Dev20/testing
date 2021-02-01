@@ -2,7 +2,6 @@ package asdum.uz.map.dataaccess;
 
 import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.enums.BusStopStatusEnum;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +84,6 @@ public class BusMapAccessor {
         synchronized (BusMapAccessor.class) {
             List<BusStop> busStops = BusMapAccessor.getInstance().getBusStops(BusStopStatusEnum.ALL);
             for (BusStop busStop : busStops) {
-                System.out.println("Ochdi " + busStop.getName());
                 removeFromStatusMap(busStop);
             }
         }

@@ -1,6 +1,6 @@
 package asdum.uz.map;
 
-    import asdum.uz.entity.enums.ResStatusEnum;
+import asdum.uz.entity.enums.ResStatusEnum;
 import asdum.uz.map.ctrl.BusMapQueryHandler;
 import asdum.uz.map.dataaccess.BusMapAccessor;
 import asdum.uz.map.model.BusStop;
@@ -9,7 +9,6 @@ import asdum.uz.map.server.BusStopService;
 import asdum.uz.payload.ApiResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,8 +30,8 @@ public class MapController {
     }
 
     @GetMapping(value = "/radius", produces = "application/json")
-    public List<BusStop> getBusStopByQuery(@RequestParam(value = "latitude", required = false) Double latitude, @RequestParam(value = "longitude", required = false) Double longitude, @RequestParam(value = "radius", defaultValue = "0.5", required = false) Double radius) {
-        return BusMapQueryHandler.getInstance().getBusStop(latitude, longitude, radius);
+    public Object getBusStopByQuery(@RequestParam(value = "latitude", required = false) Double latitude, @RequestParam(value = "longitude", required = false) Double longitude) {
+        return BusMapQueryHandler.getInstance().getBusStop(latitude, longitude);
     }
 
     @GetMapping("/point")
@@ -43,8 +42,7 @@ public class MapController {
 
     @GetMapping("/test")
     public ApiResponseModel test(@RequestParam(name = "aPointLng") double aPointLng, @RequestParam(name = "aPointLat") double aPointLat, @RequestParam(name = "bPointLng") double bPointLng, @RequestParam(name = "bPointLat") double bPointLat) {
-        return busStopService.test2(aPointLat, aPointLng, bPointLat, bPointLng);
-//        return new ApiResponseModel(response != null ? ResStatusEnum.INFO : ResStatusEnum.WARNING, response != null ? "200" : "100", null);
+        return busStopService.test4(aPointLat, aPointLng, bPointLat, bPointLng);
     }
 
     @GetMapping("/point/{busId}")
@@ -52,8 +50,8 @@ public class MapController {
         return new ApiResponseModel(ResStatusEnum.INFO, "200", busStopService.getRoot(aPointId, bPointId, busId));
     }
 
-    @Scheduled(cron = "0 0 12 1 * ?")
-    public void updateData() {
+    //    @Scheduled(cron = "0 0 12 1 * ?")
+    public void updateData() {//todo shotga etibor ber
         BusMapAccessor.getInstance().removeAllBusStop();
 //        BusStopSetUpData.getInstance().initialize();
     }
