@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-//@CrossOrigin
 @RequestMapping("/api/mobile/v2")
 public class ApiMobileV2Controller {
 

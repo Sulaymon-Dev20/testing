@@ -6,10 +6,7 @@ import asdum.uz.repositroy.first.TableRepository;
 import asdum.uz.repositroy.secoud.StolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -42,8 +39,8 @@ public class Controller {
     }
 
     @GetMapping("/test")
-    public List<Map<String,Object>> gettest(@RequestParam String table) {
-        return jdbcTemplate.queryForList("select * from "+table+"");
+    public List<Map<String,Object>> gettest(@RequestBody String query) {
+        return jdbcTemplate.queryForList(query);
     }
 
     @GetMapping("/api2")

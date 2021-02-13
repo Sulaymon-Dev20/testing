@@ -70,8 +70,7 @@ public class BusStopSetUpData implements CommandLineRunner {
                                 busStop.setNameLt(ApiMobileV2Service.ltConcertKr(busStop.getName()));
                                 busStop.setRouteDataList(list1);
                                 BusMapAccessor.getInstance().addBusStop(busStop);
-*/
-/*                                new Thread(() -> {
+                                new Thread(() -> {
                                     try {
                                         List<MyBusRoute> routeList = new ArrayList<>();
                                         for (Map<String, Object> data : list1) {
@@ -82,7 +81,7 @@ public class BusStopSetUpData implements CommandLineRunner {
                                     } catch (Exception e) {
                                         System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🥵 " + "\u001B[0m" + "Error 2 thread");
                                     }
-                                }).start();*//*
+                                }).start();
 
                             } catch (Exception e) {
                                 System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🥵 " + "\u001B[0m" + "Error First thread");
@@ -139,14 +138,12 @@ public class BusStopSetUpData implements CommandLineRunner {
                 System.err.println("Error");
             }
         }).start();
-*/
-/*        for (int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j++) {
             if (j < 30) {
                 continue;
             }
             System.out.println(j);
-        }*//*
-
+        }
     }
 }
 */
