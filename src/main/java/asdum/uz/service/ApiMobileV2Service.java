@@ -1,5 +1,6 @@
 package asdum.uz.service;
 
+//import asdum.uz.config.CacheConfig;
 import asdum.uz.config.CacheConfig;
 import asdum.uz.entity.enums.ResStatusEnum;
 import asdum.uz.model.Bus;
@@ -9,6 +10,7 @@ import asdum.uz.model.ViaResponse;
 import asdum.uz.payload.ApiResponseModel;
 import asdum.uz.payload.RealTime;
 import asdum.uz.payload.ResStations;
+import asdum.uz.utils.Util;
 import com.hazelcast.core.IMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,14 +35,13 @@ public class ApiMobileV2Service {
             IMap<Long, Map<String, Object>> routeProps = cacheConfig.getRoutes().getMap("routeProps");
             List<Map<String, Object>> list = new ArrayList<>();
             for (Map.Entry<Long, Map<String, Object>> route : routeProps.entrySet()) {
-                Long key = route.getKey();
                 Map<String, Object> value = route.getValue();
-                value.put("route_id", key);
+                value.put("route_id", route.getKey());
                 list.add(value);
             }
             return new ApiResponseModel(ResStatusEnum.INFO, "200", list);
         } catch (Exception e) {
-            return new ApiResponseModel(ResStatusEnum.WARNING, "200", null);
+            return new ApiResponseModel(ResStatusEnum.WARNING, "200", new ArrayList<>());
         }
     }
 
@@ -69,12 +70,12 @@ public class ApiMobileV2Service {
         return cacheConfig.getRoutes().getMap("routeStations");
     }
 
-    public ApiResponseModel routeStationsByBusId(Long id) {
+    public Object routeStationsByBusId(Long id) {
         try {
             String query = "select s.id, p.id as pid,  s.name sn, p.distance d, p.marshrut_id mid, p.lat, p.lng from stations s left join points p on p.station_id=s.id where s.id>0 and length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = (select id from marshrut where id=" + id + " and  viamobile=true) order by length(s.name), name, p.distance";
-            return new ApiResponseModel(ResStatusEnum.INFO, "200", jdbcTemplate.queryForList(query));
+            return jdbcTemplate.queryForList(query);
         } catch (Exception e) {
-            return new ApiResponseModel(ResStatusEnum.WARNING, "200", null);
+            return new ArrayList<>();
         }
     }
 
@@ -101,14 +102,16 @@ public class ApiMobileV2Service {
 
     public ApiResponseModel vectorData(Integer page, Integer size) {
         Map<String, Map<String, List<VectorStation>>> vectorData = cacheConfig.getRoutes().getMap("vectorData");
-        ArrayList<Object> keyList = new ArrayList<Object>(vectorData.values());
+        ArrayList<Object> keyList = new ArrayList<>(vectorData.values());
         int number = page > 0 ? page * size : 0;
         return new ApiResponseModel(ResStatusEnum.INFO, "200", keyList.subList(number, number + size));
     }
 
+    //    ExecStart=/opt/tomcat/apache-tomcat-8.5.63/bin/startup.sh
+//    ExecStop=/opt/tomcat/apache-tomcat-8.5.63/bin/shutdown.sh
     public ResStations getByRoot(Long id) {
         try {
-            String sql = "select s.id,  s.name sn, p.distance d, p.lat, p.lng, case  when s.id=m.kpp1 then '1' when s.id =m.kpp2 then '2' end side from stations s left join points p on p.station_id=s.id left join marshrut m on m.id=" + id + " and m.viamobile=true and m.deleted=false where length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = m.id and m.deleted=false order by p.distance";
+            String sql = "select s.id, s.name sn, p.distance d, p.lat, p.lng, case  when s.id=m.kpp1 then '1' when s.id =m.kpp2 then '2' end side from stations s left join points p on p.station_id=s.id left join marshrut m on m.id=" + id + " and m.viamobile=true and m.deleted=false where length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = m.id and m.deleted=false order by p.distance";
             String sql1 = "select p.id, p.marshrut_id, p.station_id, p.lat, p.lng, case when p.station_id = m.kpp1 then '1' when p.station_id = m.kpp2 then '2' end sidePoint from points p join marshrut m on p.marshrut_id = m.id where p.marshrut_id =" + id + " and m.deleted=false ";
             ResStations resStations = new ResStations();
             List<Object> kpp1 = new ArrayList<>();
@@ -169,7 +172,7 @@ public class ApiMobileV2Service {
                     viaResponse.setSpeed(bus.getSpeed());
                     viaResponse.setBusId(bus.getBusID());
                     viaResponse.setRemainingDistance(bus.getMileage() <= stationDist ? Math.round((stationDist - bus.getMileage()) * 1000) : Math.round(Double.parseDouble(routeProps.get(routeId).get("total").toString()) - bus.getMileage() + stationDist) * 1000);
-//                    viaResponse.setRemainingDistance(viaResponse.getRemainingDistance() > Util.VIA_STATION_POGRESHNOST ? viaResponse.getRemainingDistance() - Util.VIA_STATION_POGRESHNOST : 0);
+                    viaResponse.setRemainingDistance(viaResponse.getRemainingDistance() > Util.VIA_STATION_POGRESHNOST ? viaResponse.getRemainingDistance() - Util.VIA_STATION_POGRESHNOST : 0);
                     viaResponse.setRemainingTime(Math.round(viaResponse.getRemainingDistance() / 7.5d));
                     responseList.add(viaResponse);
                 }
@@ -190,16 +193,6 @@ public class ApiMobileV2Service {
         }
     }
 
-    public ApiResponseModel test(Integer page, Integer size, String search) {
-        try {
-            int number = page > 0 ? page * size : 0;
-            String station = "select s.id,s.name,s.lat,s.lng,s.distance,s.routes from stations s where UPPER(s.name) like upper('%" + search + "%') and s.deleted=false order by s.distance limit " + size + " offset " + number + "";
-            return new ApiResponseModel(ResStatusEnum.INFO, "200", jdbcTemplate.queryForList(station));
-        } catch (Exception e) {
-            return new ApiResponseModel(ResStatusEnum.WARNING, "200", null);
-        }
-    }
-
     public ApiResponseModel getBySearch(Integer page, Integer size, String search) {
         try {
             IMap<Long, List<Long>> stationRoutes = cacheConfig.getRoutes().getMap("stationRoutes");
@@ -213,22 +206,28 @@ public class ApiMobileV2Service {
                 Map<String, Object> map = maps.get(index);
                 List<Long> list = stationRoutes.get(Long.valueOf(map.get("id").toString()));
                 if (list != null) {
+                    List<Object> objects = new ArrayList<>();
                     for (Map.Entry<Long, Map<String, Object>> route : routeProps.getAll(new HashSet<>(list)).entrySet()) {
                         Map<String, Object> value = route.getValue();
                         value.put("route_id", route.getKey());
-                        map.put("routeDataList", value);
+                        objects.add(value);
                     }
+                    map.put("routeDataList", objects);
+                } else {
+                    map.put("routeDataList", new ArrayList<>());
                 }
                 index++;
             }
             return new ApiResponseModel(ResStatusEnum.INFO, "200", maps);
         } catch (Exception e) {
-            return new ApiResponseModel(ResStatusEnum.WARNING, "200", null);
+            return new ApiResponseModel(ResStatusEnum.WARNING, "200", new ArrayList<>());
         }
     }
 
     public LinkedList<VectorBus> getVectorBuses(Long route) {
         IMap<Long, LinkedList<VectorBus>> vectorBusesMap = cacheConfig.getRoutes().getMap("vectorBusesMap");
+        IMap<Long, Map<String, Object>> vectorBusesMap1 = cacheConfig.getRoutes().getMap("vectorBusesMap");
+        System.out.println(vectorBusesMap1);
         return vectorBusesMap.get(route);
     }
 
@@ -242,6 +241,15 @@ public class ApiMobileV2Service {
                 i++;
             } else if (message.charAt(i) == 'c' && message.charAt(i + 1) == 'h') {
                 krill.append("ч");
+                i++;
+            } else if (message.charAt(i) == 'y' && message.charAt(i + 1) == 'a') {
+                krill.append("я");
+                i++;
+            } else if (message.charAt(i) == 'y' && message.charAt(i + 1) == 'o') {
+                krill.append("ё");
+                i++;
+            } else if (message.charAt(i) == 'y' && message.charAt(i + 1) == 'u') {
+                krill.append("ю");
                 i++;
             } else if (message.charAt(i) == 'a') {
                 krill.append("а");
@@ -259,6 +267,8 @@ public class ApiMobileV2Service {
                 krill.append("ж");
             } else if (message.charAt(i) == 'z') {
                 krill.append("з");
+            } else if (message.charAt(i) == 'q') {
+                krill.append("қ");
             } else if (message.charAt(i) == 'i') {
                 krill.append("и");
             } else if (message.charAt(i) == 'y') {
@@ -285,7 +295,7 @@ public class ApiMobileV2Service {
                 krill.append("у");
             } else if (message.charAt(i) == 'f') {
                 krill.append("ф");
-            } else if (message.charAt(i) == 'h') {
+            } else if (message.charAt(i) == 'h' || message.charAt(i) == 'x') {
                 krill.append("х");
             } else if (message.charAt(i) == 'e') {
                 krill.append("э");
@@ -335,14 +345,204 @@ public class ApiMobileV2Service {
                 krill.append("х");
             } else if (message.charAt(i) == 'э') {
                 krill.append("э");
-            }
-            if (message.charAt(i) < 97) {
-                krill.setCharAt(krill.length() - 1, (char) (krill.charAt(krill.length()) - 32));
+            } else if (message.charAt(i) == '0') {
+                krill.append("0");
+            } else if (message.charAt(i) == ' ') {
+                krill.append(" ");
+            } else if (message.charAt(i) == '1') {
+                krill.append("1");
+            } else if (message.charAt(i) == '2') {
+                krill.append("2");
+            } else if (message.charAt(i) == '3') {
+                krill.append("3");
+            } else if (message.charAt(i) == '4') {
+                krill.append("4");
+            } else if (message.charAt(i) == '5') {
+                krill.append("5");
+            } else if (message.charAt(i) == '6') {
+                krill.append("6");
+            } else if (message.charAt(i) == '7') {
+                krill.append("7");
+            } else if (message.charAt(i) == '8') {
+                krill.append("8");
+            } else if (message.charAt(i) == '9') {
+                krill.append("9");
+            } else {
+                krill.append(message.charAt(i));
             }
             i++;
         }
 
         return krill.toString();
+    }
+
+    public static String ltConcertKr(String message) {
+        StringBuilder krill = new StringBuilder();
+        int i = 0;
+        while (i < message.length()) {
+            if (message.charAt(i) == 'ё') {
+                krill.append("yo");
+            } else if (message.charAt(i) == 'Ё') {
+                krill.append("Yo");
+            } else if (message.charAt(i) == 'ю') {
+                krill.append("yu");
+            } else if (message.charAt(i) == 'Ю') {
+                krill.append("Yu");
+            } else if (message.charAt(i) == 'ч') {
+                krill.append("ch");
+            } else if (message.charAt(i) == 'Ч') {
+                krill.append("Ch");
+            } else if (message.charAt(i) == 'я') {
+                krill.append("ya");
+            } else if (message.charAt(i) == 'Я') {
+                krill.append("Ya");
+            } else if (message.charAt(i) == 'ш') {
+                krill.append("sh");
+            } else if (message.charAt(i) == 'Ш') {
+                krill.append("Sh");
+            } else if (message.charAt(i) == 'а') {
+                krill.append("а");
+            } else if (message.charAt(i) == 'А') {
+                krill.append("A");
+            } else if (message.charAt(i) == 'ғ') {
+                krill.append("g`");
+            } else if (message.charAt(i) == 'Ғ') {
+                krill.append("G`");
+            } else if (message.charAt(i) == 'б') {
+                krill.append("b");
+            } else if (message.charAt(i) == 'Б') {
+                krill.append("B");
+            } else if (message.charAt(i) == 'в') {
+                krill.append("v");
+            } else if (message.charAt(i) == 'В') {
+                krill.append("V");
+            } else if (message.charAt(i) == 'ў') {
+                krill.append("o`");
+            } else if (message.charAt(i) == 'Ў') {
+                krill.append("O`");
+            } else if (message.charAt(i) == 'г') {
+                krill.append("g");
+            } else if (message.charAt(i) == 'Г') {
+                krill.append("G");
+            } else if (message.charAt(i) == 'д') {
+                krill.append("d");
+            } else if (message.charAt(i) == 'Д') {
+                krill.append("D");
+            } else if (message.charAt(i) == 'е') {
+                krill.append("e");
+            } else if (message.charAt(i) == 'Е') {
+                krill.append("E");
+            } else if (message.charAt(i) == 'ж') {
+                krill.append("j");
+            } else if (message.charAt(i) == 'Ж') {
+                krill.append("J");
+            } else if (message.charAt(i) == 'з') {
+                krill.append("z");
+            } else if (message.charAt(i) == 'З') {
+                krill.append("Z");
+            } else if (message.charAt(i) == 'қ') {
+                krill.append("q");
+            } else if (message.charAt(i) == 'Қ') {
+                krill.append("Q");
+            } else if (message.charAt(i) == 'и') {
+                krill.append("i");
+            } else if (message.charAt(i) == 'И') {
+                krill.append("I");
+            } else if (message.charAt(i) == 'й') {
+                krill.append("y");
+            } else if (message.charAt(i) == 'Й') {
+                krill.append("Y");
+            } else if (message.charAt(i) == 'к') {
+                krill.append("k");
+            } else if (message.charAt(i) == 'К') {
+                krill.append("K");
+            } else if (message.charAt(i) == 'л') {
+                krill.append("l");
+            } else if (message.charAt(i) == 'Л') {
+                krill.append("L");
+            } else if (message.charAt(i) == 'м') {
+                krill.append("m");
+            } else if (message.charAt(i) == 'М') {
+                krill.append("M");
+            } else if (message.charAt(i) == 'н') {
+                krill.append("n");
+            } else if (message.charAt(i) == 'Н') {
+                krill.append("N");
+            } else if (message.charAt(i) == 'о') {
+                krill.append("o");
+            } else if (message.charAt(i) == 'О') {
+                krill.append("O");
+            } else if (message.charAt(i) == 'п') {
+                krill.append("p");
+            } else if (message.charAt(i) == 'П') {
+                krill.append("P");
+            } else if (message.charAt(i) == 'р') {
+                krill.append("r");
+            } else if (message.charAt(i) == 'Р') {
+                krill.append("R");
+            } else if (message.charAt(i) == 'с') {
+                krill.append("s");
+            } else if (message.charAt(i) == 'С') {
+                krill.append("S");
+            } else if (message.charAt(i) == 'т') {
+                krill.append("t");
+            } else if (message.charAt(i) == 'Т') {
+                krill.append("T");
+            } else if (message.charAt(i) == 'у') {
+                krill.append("u");
+            } else if (message.charAt(i) == 'У') {
+                krill.append("U");
+            } else if (message.charAt(i) == 'ф') {
+                krill.append("f");
+            } else if (message.charAt(i) == 'Ф') {
+                krill.append("F");
+            } else if (message.charAt(i) == 'х') {
+                krill.append("x");
+            } else if (message.charAt(i) == 'Х') {
+                krill.append("X");
+            } else if (message.charAt(i) == 'ҳ') {
+                krill.append("h");
+            } else if (message.charAt(i) == 'Ҳ') {
+                krill.append("H");
+            } else if (message.charAt(i) == 'э') {
+                krill.append("e");
+            } else if (message.charAt(i) == 'Э') {
+                krill.append("E");
+            } else if (message.charAt(i) == '0') {
+                krill.append("0");
+            } else if (message.charAt(i) == ' ') {
+                krill.append(" ");
+            } else if (message.charAt(i) == '1') {
+                krill.append("1");
+            } else if (message.charAt(i) == '2') {
+                krill.append("2");
+            } else if (message.charAt(i) == '3') {
+                krill.append("3");
+            } else if (message.charAt(i) == '4') {
+                krill.append("4");
+            } else if (message.charAt(i) == '5') {
+                krill.append("5");
+            } else if (message.charAt(i) == '6') {
+                krill.append("6");
+            } else if (message.charAt(i) == '7') {
+                krill.append("7");
+            } else if (message.charAt(i) == '8') {
+                krill.append("8");
+            } else if (message.charAt(i) == '9') {
+                krill.append("9");
+            } else {
+                krill.append(message.charAt(i));
+            }
+            i++;
+        }
+        return krill.toString();
+    }
+
+    public static void main(String[] args) {
+        String s = ltConcertKr("Сулаймон Аскар");
+//        String s1 = s.substring(0, 1).toUpperCase() + s.substring(1);
+        System.out.println(s);
+
     }
 
     @PostConstruct

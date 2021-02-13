@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class MyBusBackendApplication {
     public static void main(String[] args) {
-        if(InitConfig.isStart())SpringApplication.run(MyBusBackendApplication.class, args);
-//        BusStopSetUpData.getInstance().initialize();
+        if (InitConfig.isStart()) SpringApplication.run(MyBusBackendApplication.class, args);
     }
 }

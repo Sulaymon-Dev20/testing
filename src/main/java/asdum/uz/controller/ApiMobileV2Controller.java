@@ -1,6 +1,7 @@
 package asdum.uz.controller;
 
 import asdum.uz.entity.enums.ResStatusEnum;
+import asdum.uz.model.ViaResponse;
 import asdum.uz.payload.ApiResponseModel;
 import asdum.uz.payload.RealTime;
 import asdum.uz.service.ApiMobileV2Service;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+//@CrossOrigin
 @RequestMapping("/api/mobile/v2")
 public class ApiMobileV2Controller {
 
@@ -29,7 +31,7 @@ public class ApiMobileV2Controller {
 
     @GetMapping("/stationRoutes/{id}")
     public HttpEntity<?> stationRoutes(@PathVariable Long id) {
-        return ResponseEntity.ok(new ApiResponseModel(ResStatusEnum.INFO, "200", service.stationRoutes(id)));
+        return ResponseEntity.ok(service.stationRoutes(id));
     }
 
     @GetMapping("/stationRoutes")
@@ -77,12 +79,13 @@ public class ApiMobileV2Controller {
 
     @GetMapping("/getByRoot/{id}")
     public HttpEntity<?> getStationsBySort(@PathVariable Long id) {
-        return ResponseEntity.ok(new ApiResponseModel(ResStatusEnum.INFO, "200", service.getByRoot(id)));
+        return ResponseEntity.ok(service.getByRoot(id));
     }
 
     @GetMapping("/getBusByTime")
     public HttpEntity<?> getBusByTime(@RequestParam Long routeId, @RequestParam Long stationId) {
-        return ResponseEntity.ok(new ApiResponseModel(ResStatusEnum.INFO, "200", service.getBusByTime(routeId, stationId).getList()));
+        List<ViaResponse> list = service.getBusByTime(routeId, stationId).getList();
+        return ResponseEntity.ok(new ApiResponseModel(ResStatusEnum.INFO, "200", list != null ? list : new ArrayList<>()));
     }
 
     @GetMapping("/getPointsByMarshrut/{id}")
@@ -112,13 +115,5 @@ public class ApiMobileV2Controller {
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
             @RequestParam(value = "search") String search) {
         return ResponseEntity.ok(service.getBySearch(page, size, search));
-    }
-
-    @GetMapping("/test/search")
-    public HttpEntity<?> test(
-            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
-            @RequestParam(value = "search") String search) {
-        return ResponseEntity.ok(service.test(page, size, search));
     }
 }

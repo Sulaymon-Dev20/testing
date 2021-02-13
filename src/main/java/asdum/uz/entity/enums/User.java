@@ -1,9 +1,9 @@
+/*
 package asdum.uz.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -18,3 +18,4 @@ public class User implements Serializable {
     private String sid;
     private Date date;
 }
+*/

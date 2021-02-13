@@ -1,3 +1,4 @@
+/*
 package asdum.uz.repositroy;
 
 import asdum.uz.col.UserCol;
@@ -11,3 +12,4 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository <User,String> {
     Optional<UserCol> findBySid(String sid);
 }
+*/

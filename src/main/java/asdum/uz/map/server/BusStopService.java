@@ -1,10 +1,11 @@
+/*
 package asdum.uz.map.server;
 
-import asdum.uz.config.CacheConfig;
+//import asdum.uz.config.CacheConfig;
 import asdum.uz.entity.enums.ResStatusEnum;
 import asdum.uz.map.ctrl.BusMapQueryHandler;
 import asdum.uz.map.dataaccess.BusMapAccessor;
-import asdum.uz.map.metro.MetroRepository;
+//import asdum.uz.map.metro.MetroRepository;
 import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.Root;
 import asdum.uz.map.model.Root2;
@@ -33,14 +34,15 @@ public class BusStopService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    CacheConfig cacheConfig;
+//    @Autowired
+//    CacheConfig cacheConfig;
 
     @Autowired
     ApiMobileV2Service mobileService;
 
-    @Autowired
-    MetroRepository metroRepository;
+//    @Autowired
+//    MetroRepository metroRepository;
+*/
 /*
     @Value("${first}")
     private String firstLine;
@@ -52,7 +54,8 @@ public class BusStopService {
     private String thirdLine;
 
     @Value("${fourth}")
-    private String fourthLine;*/
+    private String fourthLine;*//*
+
 
     public Root filter(Root2 root2) {
         try {
@@ -83,7 +86,8 @@ public class BusStopService {
                     }
                 }
             }
-           /* else {
+           */
+/* else {
                 List<MetroStop> all = root2.getAPoint().getId() < root2.getBPoint().getId() ? metroRepository.findAllByRoute(root2.getAPoint().getRoute()) : metroRepository.findAllByRoute2(root2.getAPoint().getRoute());
                 if (root2.getAPoint().getRoute().hashCode() == root2.getBPoint().getRoute().hashCode()) {
                     boolean status = false;
@@ -128,7 +132,8 @@ public class BusStopService {
                         }
                     }
                 }
-            }*/
+            }*//*
+
             return new Root(root2.getAPoint().getStatus() == null ? "BUS_STOP" : "METRO", root2.getAPoint(), root2.getBPoint(), routs, root2.getDistanceA(), root2.getDistance(), root2.getDistanceB());
         } catch (Exception e) {
             return new Root(null, null, null, null, null, null, null);
@@ -136,56 +141,63 @@ public class BusStopService {
     }
 
     public ApiResponseModel test4(double aPointLat, double aPointLng, double bPointLat, double bPointLng) {
-        Test2 test2 = BusMapQueryHandler.getInstance().test(aPointLat, aPointLng, bPointLat, bPointLng);
-        List<Response> responses = new ArrayList<>();
-        int indexA = 0;
-        int size = test2.getA().size();
-        List<BusStop> a = test2.getA();
-        while (size != indexA) {
-            BusStop busStop = a.get(indexA);
-            indexA++;
-            int indexB = 0;
-            int size1 = test2.getB().size();
-            while (size1 != indexB) {
-                BusStop stop = test2.getB().get(indexB);
-                indexB++;
-                List<Object> routs = new ArrayList<>();
-                int bigIndex = 0;
-                int size2 = busStop.getRouteDataList().size();
-                while (size2 != bigIndex) {
-                    Map<String, Object> aPointRoots = busStop.getRouteDataList().get(bigIndex);
-                    int index = 0;
-                    int size3 = stop.getRouteDataList().size();
-                    while (size3 != index) {
-                        Map<String, Object> bPointRoots = stop.getRouteDataList().get(index);
-                        if (aPointRoots.hashCode() == bPointRoots.hashCode()) {
-                            routs.add(aPointRoots);
+        try {
+            Test2 test2 = BusMapQueryHandler.getInstance().test(aPointLat, aPointLng, bPointLat, bPointLng);
+            List<Response> responses = new ArrayList<>();
+            int indexA = 0;
+            int size = test2.getA().size();
+            List<BusStop> a = test2.getA();
+            while (size != indexA) {
+                BusStop busStop = a.get(indexA);
+                indexA++;
+                int indexB = 0;
+                int size1 = test2.getB().size();
+                while (size1 != indexB) {
+                    BusStop stop = test2.getB().get(indexB);
+                    indexB++;
+                    List<Object> routs = new ArrayList<>();
+                    int bigIndex = 0;
+                    int size2 = busStop.getRouteDataList().size();
+                    while (size2 != bigIndex) {
+                        Map<String, Object> aPointRoots = busStop.getRouteDataList().get(bigIndex);
+                        int index = 0;
+                        int size3 = stop.getRouteDataList().size();
+                        while (size3 != index) {
+                            Map<String, Object> bPointRoots = stop.getRouteDataList().get(index);
+                            if (aPointRoots.hashCode() == bPointRoots.hashCode()) {
+                                routs.add(aPointRoots);
+                            }
+                            index++;
                         }
-                        index++;
+                        bigIndex++;
                     }
-                    bigIndex++;
-                }
-                if (routs.size() > 0) {
-                    responses.add(new Response(busStop, stop, routs, distance(aPointLat, aPointLat, busStop.getLat(), busStop.getLng(), 'M'), distance(busStop.getLat(), busStop.getLng(), stop.getLat(), stop.getLng(), 'M'), distance(stop.getLat(), stop.getLng(), bPointLat, bPointLng, 'M')));
+                    if (routs.size() > 0) {
+                        if (busStop.getId() != stop.getId()) {
+                            responses.add(new Response(busStop, stop, routs, distance(aPointLat, aPointLng, busStop.getLat(), busStop.getLng(), 'M'), distance(busStop.getLat(), busStop.getLng(), stop.getLat(), stop.getLng(), 'M'), distance(stop.getLat(), stop.getLng(), bPointLat, bPointLng, 'M')));
+                        }
+                    }
                 }
             }
+            return new ApiResponseModel(ResStatusEnum.INFO, "200", responses);
+        } catch (Exception e) {
+            return new ApiResponseModel(ResStatusEnum.INFO, "200", new ArrayList<>());
         }
-        return new ApiResponseModel(ResStatusEnum.INFO, "200", responses);
     }
 
-    public Object getRoot(Long aPointId, Long bPointId, Long busId) {
+    public Points getRoot(Long aPointId, Long bPointId, Long busId) {
         String kpp1 = "select p.id, p.distance, p.lat, p.lng, p.marshrut_id, p.station_id ,s.name,case when p.station_id = " + aPointId + " then '1' when p.station_id = " + bPointId + " then '2' end side from points p left join stations s on s.id=p.station_id where p.marshrut_id=" + busId + " and p.distance > 0 order by p.distance ";
         List<Object> objects = new ArrayList<>();
         boolean status = false;
         if (aPointId.hashCode() != bPointId.hashCode()) {
             List<Map<String, Object>> maps = jdbcTemplate.queryForList(kpp1);
             for (Map<String, Object> map : maps) {
-                System.out.println(map.get("side"));
                 if (map.get("side") != null) {
                     String i = map.get("side").toString();
                     if (i.hashCode() == "1".hashCode()) {
                         status = true;
                     } else if (i.hashCode() == "2".hashCode()) {
+                        status = false;
+                        objects.add(map);
                         break;
                     }
                 }
@@ -193,22 +205,22 @@ public class BusStopService {
                     objects.add(map);
                 }
             }
-            if (objects.size() == 0) {
+            if (objects.size() == 1 || objects.size() == 0) {
                 List<Map<String, Object>> maps2 = jdbcTemplate.queryForList(kpp1 + " desc");
                 for (Map<String, Object> map : maps2) {
-                    int i = Integer.parseInt(map.get("side").toString());
-                    if (i == 1) {
-                        status = true;
-                    } else if (i == 2) {
-                        break;
-                    }
-                    if (status) {
-                        objects.add(map);
+                    if (map.get("side") != null) {
+                        String i = map.get("side").toString();
+                        if (i.hashCode() == "1".hashCode()) {
+                            status = true;
+                        } else if (i.hashCode() == "2".hashCode()) {
+                            objects.add(map);
+                            break;
+                        }
                     }
                 }
             }
         }
-        return objects;
+        return new Points(objects, objects);
     }
 
     private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
@@ -239,3 +251,11 @@ class Response {
     private double distance;
     private double distanceB;
 }
+
+@Data
+@AllArgsConstructor
+class Points {
+    private List<Object> points;
+    private List<Object> stations;
+}
+*/

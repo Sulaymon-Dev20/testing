@@ -28,6 +28,9 @@ public class ViaResponse {
     @JsonProperty(value = "onOff")
     private Integer onOff;
 
+    @JsonProperty(value = "location")
+    private Object location;
+
 /*    @JsonProperty(value = "polygonType")
     private Integer polygonType;*/
 

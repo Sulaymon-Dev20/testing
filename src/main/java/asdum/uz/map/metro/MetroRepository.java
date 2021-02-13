@@ -1,3 +1,4 @@
+/*
 package asdum.uz.map.metro;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,3 +18,4 @@ public interface MetroRepository extends JpaRepository<MetroStop, Integer> {
     @Query(value = "select * from metro_stop m where m.name=:name limit 1", nativeQuery = true)
     Optional<MetroStop> selectStations(@Value("name") String name);
 }
+*/

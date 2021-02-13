@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.util.Properties;
 
 public class InitConfig {
-
     public static boolean isStart() {
         Properties props = new Properties();
         try {

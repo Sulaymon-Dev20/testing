@@ -23,14 +23,14 @@ public class CacheConfig {
         return HazelcastClient.newHazelcastClient(clientConfig);
     }
 
-/*    @Bean
-    public HazelcastInstance getLocation() {
-        ClientConfig clientConfig1 = new ClientConfig();
-        clientConfig1.getNetworkConfig().addAddress("192.168.0.30:5701");
-        clientConfig1.getGroupConfig().setName("location");
-        clientConfig1.getGroupConfig().setPassword("1234");
-        return HazelcastClient.newHazelcastClient(clientConfig1);
-    }*/
+//    @Bean
+//    public HazelcastInstance getLocation() {
+//        ClientConfig clientConfig1 = new ClientConfig();
+//        clientConfig1.getNetworkConfig().addAddress("192.168.0.30:5701");
+//        clientConfig1.getGroupConfig().setName("location");
+//        clientConfig1.getGroupConfig().setPassword("1234");
+//        return HazelcastClient.newHazelcastClient(clientConfig1);
+//    }
 
     @Bean
     public CacheManager cacheManager() {
