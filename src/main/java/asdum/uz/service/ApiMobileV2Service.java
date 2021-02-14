@@ -12,10 +12,15 @@ import asdum.uz.payload.ResStations;
 import asdum.uz.utils.Util;
 import com.hazelcast.core.IMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.*;
 
 @Service
@@ -26,6 +31,15 @@ public class ApiMobileV2Service {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Value("${app.datasource.first.url}")
+    private String url;
+
+    @Value("${app.datasource.first.username}")
+    private String user;
+
+    @Value("${app.datasource.first.password}")
+    private String password;
 
     private Comparator<ViaResponse> distanceComparator;
 
@@ -70,9 +84,26 @@ public class ApiMobileV2Service {
     }
 
     public Object routeStationsByBusId(Long id) {
+        Statement stmt = null;
         try {
-            String query = "select s.id, p.id as pid,  s.name sn, p.distance d, p.marshrut_id mid, p.lat, p.lng from stations s left join points p on p.station_id=s.id where s.id>0 and length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = (select id from marshrut where id=" + id + " and  viamobile=true) order by length(s.name), name, p.distance";
-            return jdbcTemplate.queryForList(query);
+            Class.forName("org.postgresql.Driver");
+            Connection c = DriverManager.getConnection(url, user, password);
+            c.setAutoCommit(false);
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery("select s.id, p.id as pid,  s.name sn, p.distance d, p.marshrut_id mid, p.lat, p.lng from stations s left join points p on p.station_id=s.id where s.id>0 and length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = (select id from marshrut where id=" + id + " and  viamobile=true) order by length(s.name), name, p.distance;");
+            List<Map<String, Object>> maps = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", rs.getLong("id"));
+                map.put("table_name", rs.getLong("pid"));
+                map.put("sn", rs.getString("sn"));
+                map.put("d", rs.getDouble("d"));
+                map.put("mid", rs.getDouble("mid"));
+                map.put("lat", rs.getDouble("lat"));
+                map.put("lng", rs.getDouble("lng"));
+                maps.add(map);
+            }
+            return maps;
         } catch (Exception e) {
             return new ArrayList<>();
         }
