@@ -1,11 +1,11 @@
-/*
 package asdum.uz.map.server;
 
-//import asdum.uz.config.CacheConfig;
+import asdum.uz.config.CacheConfig;
 import asdum.uz.entity.enums.ResStatusEnum;
 import asdum.uz.map.ctrl.BusMapQueryHandler;
 import asdum.uz.map.dataaccess.BusMapAccessor;
 //import asdum.uz.map.metro.MetroRepository;
+import asdum.uz.map.metro.MetroStop;
 import asdum.uz.map.model.BusStop;
 import asdum.uz.map.model.Root;
 import asdum.uz.map.model.Root2;
@@ -34,17 +34,15 @@ public class BusStopService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-//    @Autowired
-//    CacheConfig cacheConfig;
+    @Autowired
+    CacheConfig cacheConfig;
 
     @Autowired
     ApiMobileV2Service mobileService;
 
 //    @Autowired
 //    MetroRepository metroRepository;
-*/
-/*
-    @Value("${first}")
+/*    @Value("${first}")
     private String firstLine;
 
     @Value("${second}")
@@ -54,9 +52,10 @@ public class BusStopService {
     private String thirdLine;
 
     @Value("${fourth}")
-    private String fourthLine;*//*
+    private String fourthLine;*/
 
 
+/*
     public Root filter(Root2 root2) {
         try {
             List<Object> routs = new ArrayList<>();
@@ -86,9 +85,9 @@ public class BusStopService {
                     }
                 }
             }
-           */
-/* else {
-                List<MetroStop> all = root2.getAPoint().getId() < root2.getBPoint().getId() ? metroRepository.findAllByRoute(root2.getAPoint().getRoute()) : metroRepository.findAllByRoute2(root2.getAPoint().getRoute());
+ else {
+*/
+/*                List<MetroStop> all = root2.getAPoint().getId() < root2.getBPoint().getId() ? metroRepository.findAllByRoute(root2.getAPoint().getRoute()) : metroRepository.findAllByRoute2(root2.getAPoint().getRoute());
                 if (root2.getAPoint().getRoute().hashCode() == root2.getBPoint().getRoute().hashCode()) {
                     boolean status = false;
                     if (root2.getAPoint().getRoute().hashCode() == root2.getBPoint().getRoute().hashCode()) {
@@ -240,6 +239,8 @@ public class BusStopService {
         return (rad * 180.0 / Math.PI);
     }
 }
+*/
+}
 
 @Data
 @AllArgsConstructor
@@ -258,4 +259,3 @@ class Points {
     private List<Object> points;
     private List<Object> stations;
 }
-*/

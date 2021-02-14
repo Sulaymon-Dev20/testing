@@ -1,4 +1,3 @@
-/*
 package asdum.uz.map;
 
 import asdum.uz.config.CacheConfig;
@@ -43,7 +42,7 @@ public class MapController {
         return BusMapQueryHandler.getInstance().getBusStop(latitude, longitude);
     }
 
-    @GetMapping("/point")
+/*    @GetMapping("/point")
     public ApiResponseModel test(@RequestParam(name = "aPointLng") double aPointLng, @RequestParam(name = "aPointLat") double aPointLat, @RequestParam(name = "bPointLng") double bPointLng, @RequestParam(name = "bPointLat") double bPointLat) {
         return busStopService.test4(aPointLat, aPointLng, bPointLat, bPointLng);
     }
@@ -51,7 +50,7 @@ public class MapController {
     @GetMapping("/point/{busId}")
     public ApiResponseModel root(@PathVariable(name = "busId") Long busId, @RequestParam(name = "aPointId") Long aPointId, @RequestParam(name = "bPointId") Long bPointId) {
         return new ApiResponseModel(ResStatusEnum.INFO, "200", busStopService.getRoot(aPointId, bPointId, busId));
-    }
+    }*/
 
     @GetMapping("/query")
     public List<Map<String, Object>> query(@RequestParam(name = "query", defaultValue = "select * from stations s where s.deleted = false") String query) {
@@ -92,4 +91,4 @@ class Response {
             System.out.println(index == 4 ? index = 1 : index++);
         }
     }
-}*/
+}
