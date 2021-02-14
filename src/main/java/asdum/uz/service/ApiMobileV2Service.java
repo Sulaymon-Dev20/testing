@@ -1,6 +1,5 @@
 package asdum.uz.service;
 
-//import asdum.uz.config.CacheConfig;
 import asdum.uz.config.CacheConfig;
 import asdum.uz.entity.enums.ResStatusEnum;
 import asdum.uz.model.Bus;
@@ -536,13 +535,6 @@ public class ApiMobileV2Service {
             i++;
         }
         return krill.toString();
-    }
-
-    public static void main(String[] args) {
-        String s = ltConcertKr("Сулаймон Аскар");
-//        String s1 = s.substring(0, 1).toUpperCase() + s.substring(1);
-        System.out.println(s);
-
     }
 
     @PostConstruct
