@@ -90,7 +90,7 @@ public class ApiMobileV2Service {
             Connection c = DriverManager.getConnection(url, user, password);
             c.setAutoCommit(false);
             stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("select s.id, p.id as pid,  s.name sn, p.distance d, p.marshrut_id mid, p.lat, p.lng from stations s left join points p on p.station_id=s.id where s.id>0 and length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = (select id from marshrut where id=" + id + " and  viamobile=true) order by length(s.name), name, p.distance;");
+            ResultSet rs = stmt.executeQuery("select s.id, p.id as pid, s.name sn, p.distance d, p.marshrut_id mid, p.lat, p.lng from stations s left join points p on p.station_id=s.id where s.id>0 and length(s.name)>0 and s.deleted=false and p.distance>=0 and p.marshrut_id = (select id from marshrut where id=" + id + " and  viamobile=true) order by length(s.name), name, p.distance;");
             List<Map<String, Object>> maps = new ArrayList<>();
             while (rs.next()) {
                 Map<String, Object> map = new HashMap<>();

@@ -15,21 +15,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Objects;
 
-/**
- * Author: Khumoyun Khujamov
- * Date: 10/16/20
- * Time: 11:34 PM
- */
 @Configuration
-@EnableJpaRepositories(basePackages = "asdum.uz.repository.first",
-        entityManagerFactoryRef = "firstEntityManagerFactory",
-        transactionManagerRef= "firstTransactionManager")
+@EnableJpaRepositories(basePackages = "asdum.uz.repository.first", entityManagerFactoryRef = "firstEntityManagerFactory", transactionManagerRef = "firstTransactionManager")
 public class FirstDSConfig {
 
     @Bean
     @Primary
     @ConfigurationProperties("app.datasource.first")
-    public DataSourceProperties asdumDataSourceProperties() {
+    public DataSourceProperties firstDataSourceProperties() {
         return new DataSourceProperties();
     }
 
@@ -37,17 +30,14 @@ public class FirstDSConfig {
     @Primary
     public LocalContainerEntityManagerFactoryBean firstEntityManagerFactory(
             EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(asdumDataSource())
-                .packages("asdum.uz.entity.first")
-                .build();
+        return builder.dataSource(firstDataSource()).packages("asdum.uz.entity.first").build();
     }
 
     @Bean
     @Primary
     @ConfigurationProperties("app.datasource.first.configuration")
-    public HikariDataSource asdumDataSource() {
-        return asdumDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
+    public HikariDataSource firstDataSource() {
+        return firstDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
     @Bean

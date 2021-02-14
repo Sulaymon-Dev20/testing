@@ -15,9 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.Objects;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "asdum.uz.repository.second",
-        entityManagerFactoryRef = "secondEntityManagerFactory",
-        transactionManagerRef= "secondTransactionManager")
+@EnableJpaRepositories(basePackages = "asdum.uz.repository.second", entityManagerFactoryRef = "secondEntityManagerFactory", transactionManagerRef = "secondTransactionManager")
 public class SecondDSConfig {
 
     @Bean
@@ -33,18 +31,12 @@ public class SecondDSConfig {
     }
 
     @Bean(name = "secondEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean secondEntityManagerFactory(
-            EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(locSenderDataSource())
-//                .packages("uz.ssd.locationsender.domain.entity.locsender")
-                .packages("asdum.uz.entity.secoud")
-                .build();
+    public LocalContainerEntityManagerFactoryBean secondEntityManagerFactory(EntityManagerFactoryBuilder builder) {
+        return builder.dataSource(locSenderDataSource()).packages("asdum.uz.entity.secoud").build();
     }
 
     @Bean
-    public PlatformTransactionManager secondTransactionManager(
-            final @Qualifier("secondEntityManagerFactory") LocalContainerEntityManagerFactoryBean secondEntityManagerFactory) {
+    public PlatformTransactionManager secondTransactionManager(final @Qualifier("secondEntityManagerFactory") LocalContainerEntityManagerFactoryBean secondEntityManagerFactory) {
         return new JpaTransactionManager(Objects.requireNonNull(secondEntityManagerFactory.getObject()));
     }
 }

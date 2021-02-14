@@ -15,9 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.Objects;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "asdum.uz.repository.third",
-        entityManagerFactoryRef = "thirdEntityManagerFactory",
-        transactionManagerRef = "thirdTransactionManager")
+@EnableJpaRepositories(basePackages = "asdum.uz.repository.third", entityManagerFactoryRef = "thirdEntityManagerFactory", transactionManagerRef = "thirdTransactionManager")
 public class ThirdDSConfig {
 
     @Bean
@@ -33,17 +31,12 @@ public class ThirdDSConfig {
     }
 
     @Bean(name = "thirdEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean thirdEntityManagerFactory(
-            EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(thirdDataSource())
-                .packages("asdum.uz.entity.third")
-                .build();
+    public LocalContainerEntityManagerFactoryBean thirdEntityManagerFactory(EntityManagerFactoryBuilder builder) {
+        return builder.dataSource(thirdDataSource()).packages("asdum.uz.entity.third").build();
     }
 
     @Bean
-    public PlatformTransactionManager thirdTransactionManager(
-            final @Qualifier("thirdEntityManagerFactory") LocalContainerEntityManagerFactoryBean thirdEntityManagerFactory) {
+    public PlatformTransactionManager thirdTransactionManager(final @Qualifier("thirdEntityManagerFactory") LocalContainerEntityManagerFactoryBean thirdEntityManagerFactory) {
         return new JpaTransactionManager(Objects.requireNonNull(thirdEntityManagerFactory.getObject()));
     }
 }
