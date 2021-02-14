@@ -1,7 +1,7 @@
 package asdum.uz.controller;
 
 import asdum.uz.entity.secoud.BugList;
-import asdum.uz.repositroy.secoud.BugListRepository;
+import asdum.uz.repository.second.BugListRepository;
 import asdum.uz.service.TestingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

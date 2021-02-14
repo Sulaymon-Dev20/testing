@@ -1,4 +1,4 @@
-package asdum.uz.repositroy.first;
+package asdum.uz.repository.first;
 
 import asdum.uz.entity.first.Table;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,3 @@
-/*
 package asdum.uz.map.ctrl;
 
 import asdum.uz.config.CacheConfig;
@@ -9,6 +8,7 @@ import asdum.uz.map.entity.MyBusRoute;
 import asdum.uz.map.entity.MyBusRouteRepository;
 import asdum.uz.map.model.BusStop;
 import asdum.uz.service.ApiMobileV2Service;
+import asdum.uz.utils.ColorsTerminal;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.URL;
 import java.time.LocalDate;
@@ -37,11 +38,11 @@ public class BusStopSetUpData implements CommandLineRunner {
     @Autowired
     CacheConfig cacheConfig;
 
-    @Autowired
-    MyBusBusStopRepository myBusBusStopRepository;
+//    @Autowired
+//    MyBusBusStopRepository myBusBusStopRepository;
 
-    @Autowired
-    MyBusRouteRepository myBusRouteRepository;
+//    @Autowired
+//    MyBusRouteRepository myBusRouteRepository;
 
     @Override
     public void run(String... args) {
@@ -55,7 +56,8 @@ public class BusStopSetUpData implements CommandLineRunner {
                 });
                 IMap<Long, List<Long>> stationRoutes = cacheConfig.getRoutes().getMap("stationRoutes");
                 IMap<Long, Map<String, Object>> routeProps = cacheConfig.getRoutes().getMap("routeProps");
-                System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[34m  INFO 🧐   \u001B[0m--- [" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "]\u001B[0m  please wait 20 minutes ⏳");
+                ColorsTerminal colorsTerminal = new ColorsTerminal();
+                System.out.println(LocalDate.now() + " " + LocalTime.now() + colorsTerminal.GET_ANSI_BLUE()+"INFO 🧐 "+ManagementFactory.getRuntimeMXBean().getName().split("@")[0]+ "\u001B[0m--- [" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "]\u001B[0m  please wait 20 minutes ⏳");
                 for (BusStop busStop : busStopList) {
                     List<Long> list = stationRoutes.get(busStop.getId());
                     if (list != null) {
@@ -67,21 +69,23 @@ public class BusStopSetUpData implements CommandLineRunner {
                                     value.put("route_id", route.getKey());
                                     list1.add(value);
                                 }
+                                System.out.println(busStop.getName());
+                                System.out.println(ApiMobileV2Service.ltConcertKr(busStop.getName()));
                                 busStop.setNameLt(ApiMobileV2Service.ltConcertKr(busStop.getName()));
                                 busStop.setRouteDataList(list1);
                                 BusMapAccessor.getInstance().addBusStop(busStop);
-                                new Thread(() -> {
-                                    try {
-                                        List<MyBusRoute> routeList = new ArrayList<>();
-                                        for (Map<String, Object> data : list1) {
-                                            routeList.add(new MyBusRoute(Double.valueOf(data.get("total").toString()), Double.valueOf(data.get("half").toString()), Integer.parseInt(data.get("route_id").toString()), data.get("kpp1").toString(), data.get("kpp2").toString(), data.get("name").toString()));
-                                        }
-                                        List<MyBusRoute> myBusRoutes = myBusRouteRepository.saveAll(routeList);
-                                        myBusBusStopRepository.save(new MyBusBusStop(busStop.getId(), busStop.getName(), busStop.getNameLt(), busStop.getRoutes(), busStop.getLat(), busStop.getLng(), busStop.getStatus(), busStop.getRoute(), myBusRoutes));
-                                    } catch (Exception e) {
-                                        System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🥵 " + "\u001B[0m" + "Error 2 thread");
-                                    }
-                                }).start();
+//                                new Thread(() -> {
+//                                    try {
+//                                        List<MyBusRoute> routeList = new ArrayList<>();
+//                                        for (Map<String, Object> data : list1) {
+//                                            routeList.add(new MyBusRoute(Double.valueOf(data.get("total").toString()), Double.valueOf(data.get("half").toString()), Integer.parseInt(data.get("route_id").toString()), data.get("kpp1").toString(), data.get("kpp2").toString(), data.get("name").toString()));
+//                                        }
+//                                        List<MyBusRoute> myBusRoutes = myBusRouteRepository.saveAll(routeList);
+//                                        myBusBusStopRepository.save(new MyBusBusStop(busStop.getId(), busStop.getName(), busStop.getNameLt(), busStop.getRoutes(), busStop.getLat(), busStop.getLng(), busStop.getStatus(), busStop.getRoute(), myBusRoutes));
+//                                    } catch (Exception e) {
+//                                        System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🥵 " + "\u001B[0m" + "Error 2 thread");
+//                                    }
+//                                }).start();
 
                             } catch (Exception e) {
                                 System.out.println(LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🥵 " + "\u001B[0m" + "Error First thread");
@@ -94,7 +98,7 @@ public class BusStopSetUpData implements CommandLineRunner {
                 fixed = false;
             }
         }
-        System.out.println(fixed ? LocalDate.now() + " " + LocalTime.now() + "\u001B[34m" + "  INFO 🤓 " + "\u001B[0m" + "The data has been uploaded !" : LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🤕 " + "\u001B[0m" + "Data retrieval error");
+        System.out.println(fixed ? LocalDate.now() + " " + LocalTime.now() + "\u001B[34m" + "  INFO 🤓 " + ManagementFactory.getRuntimeMXBean().getName().split("@")[0] + "\u001B[0m" + "The data has been uploaded !" : LocalDate.now() + " " + LocalTime.now() + "\u001B[33m" + "  WARN 🤕 "+ManagementFactory.getRuntimeMXBean().getName().split("@")[0] + "\u001B[0m" + "Data retrieval error");
     }
 
     public static void main(String[] args) {
@@ -146,4 +150,3 @@ public class BusStopSetUpData implements CommandLineRunner {
         }
     }
 }
-*/

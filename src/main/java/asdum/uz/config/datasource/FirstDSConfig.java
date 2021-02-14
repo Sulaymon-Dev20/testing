@@ -21,40 +21,39 @@ import java.util.Objects;
  * Time: 11:34 PM
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "asdum.uz.repositroy.first",
-        entityManagerFactoryRef = "asdumEntityManagerFactory",
-        transactionManagerRef= "asdumTransactionManager")
+@EnableJpaRepositories(basePackages = "asdum.uz.repository.first",
+        entityManagerFactoryRef = "firstEntityManagerFactory",
+        transactionManagerRef= "firstTransactionManager")
 public class FirstDSConfig {
 
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.asdum")
+    @ConfigurationProperties("app.datasource.first")
     public DataSourceProperties asdumDataSourceProperties() {
         return new DataSourceProperties();
     }
 
-    @Bean(name = "asdumEntityManagerFactory")
+    @Bean(name = "firstEntityManagerFactory")
     @Primary
-    public LocalContainerEntityManagerFactoryBean asdumEntityManagerFactory(
+    public LocalContainerEntityManagerFactoryBean firstEntityManagerFactory(
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(asdumDataSource())
-//                .packages("uz.ssd.locationsender.domain.entity.asdum")
                 .packages("asdum.uz.entity.first")
                 .build();
     }
 
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.asdum.configuration")
+    @ConfigurationProperties("app.datasource.first.configuration")
     public HikariDataSource asdumDataSource() {
         return asdumDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
     @Bean
     @Primary
-    public PlatformTransactionManager asdumTransactionManager(
-            final @Qualifier("asdumEntityManagerFactory") LocalContainerEntityManagerFactoryBean asdumEntityManagerFactory) {
-        return new JpaTransactionManager(Objects.requireNonNull(asdumEntityManagerFactory.getObject()));
+    public PlatformTransactionManager firstTransactionManager(
+            final @Qualifier("firstEntityManagerFactory") LocalContainerEntityManagerFactoryBean firstEntityManagerFactory) {
+        return new JpaTransactionManager(Objects.requireNonNull(firstEntityManagerFactory.getObject()));
     }
 }

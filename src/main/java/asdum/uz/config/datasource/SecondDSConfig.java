@@ -15,25 +15,25 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.Objects;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "asdum.uz.repositroy.secoud",
-        entityManagerFactoryRef = "locSenderEntityManagerFactory",
-        transactionManagerRef= "locSenderTransactionManager")
+@EnableJpaRepositories(basePackages = "asdum.uz.repository.second",
+        entityManagerFactoryRef = "secondEntityManagerFactory",
+        transactionManagerRef= "secondTransactionManager")
 public class SecondDSConfig {
 
     @Bean
-    @ConfigurationProperties("app.datasource.locsender")
+    @ConfigurationProperties("app.datasource.second")
     public DataSourceProperties locSenderDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
-    @ConfigurationProperties("app.datasource.locsender.configuration")
+    @ConfigurationProperties("app.datasource.second.configuration")
     public HikariDataSource locSenderDataSource() {
         return locSenderDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
-    @Bean(name = "locSenderEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean locSenderEntityManagerFactory(
+    @Bean(name = "secondEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean secondEntityManagerFactory(
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(locSenderDataSource())
@@ -43,8 +43,8 @@ public class SecondDSConfig {
     }
 
     @Bean
-    public PlatformTransactionManager locSenderTransactionManager(
-            final @Qualifier("locSenderEntityManagerFactory") LocalContainerEntityManagerFactoryBean locSenderEntityManagerFactory) {
-        return new JpaTransactionManager(Objects.requireNonNull(locSenderEntityManagerFactory.getObject()));
+    public PlatformTransactionManager secondTransactionManager(
+            final @Qualifier("secondEntityManagerFactory") LocalContainerEntityManagerFactoryBean secondEntityManagerFactory) {
+        return new JpaTransactionManager(Objects.requireNonNull(secondEntityManagerFactory.getObject()));
     }
 }

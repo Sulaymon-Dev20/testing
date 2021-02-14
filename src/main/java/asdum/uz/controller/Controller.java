@@ -2,12 +2,18 @@ package asdum.uz.controller;
 
 import asdum.uz.entity.first.Table;
 import asdum.uz.entity.secoud.Stol;
-import asdum.uz.repositroy.first.TableRepository;
-import asdum.uz.repositroy.secoud.StolRepository;
+import asdum.uz.repository.first.TableRepository;
+import asdum.uz.repository.second.StolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -57,5 +63,10 @@ public class Controller {
             }
         }
         return tableRepository.findAll();
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        System.out.println(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
+        System.out.println(ManagementFactory.getRuntimeMXBean().getName());
     }
 }
